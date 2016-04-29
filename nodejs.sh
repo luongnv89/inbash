@@ -9,3 +9,6 @@ sudo apt-get autoremove
 sudo apt-get autoclean
 sudo npm install express -g
 sudo npm install express-generator -g
+
+echo $(node -v)
+echo $(npm -v)

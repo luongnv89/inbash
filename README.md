@@ -9,4 +9,6 @@ Bash scripts to do some work
 
 - `c_pp.sh` - Install some packages for developing c/c++ : `gcc`, `g++`, `makegit`, `cmake`
 
-- `nodejs.sh` - Install NodeJS for developing node js application: `nodejs`, 'npm', 'express', 'express-generator'
+- `nodejs.sh` - Install NodeJS for developing node js application: `nodejs`, `npm`, `express`, `express-generator`
+
+- `valgrind.sh` - Install Valgrind tool for checking memory in c/c++ program
