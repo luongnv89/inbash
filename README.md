@@ -12,3 +12,7 @@ Bash scripts to do some work
 - `nodejs.sh` - Install NodeJS for developing node js application: `nodejs`, `npm`, `express`, `express-generator`
 
 - `valgrind.sh` - Install Valgrind tool for checking memory in c/c++ program
+
+- `tomahawk.sh` - Install Tomahawk tool for generating network traffic
+
+- `gxx4.9.sh` - Install gcc/g++ version 4.9
