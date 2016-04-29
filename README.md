@@ -16,3 +16,5 @@ Bash scripts to do some work
 - `tomahawk.sh` - Install Tomahawk tool for generating network traffic
 
 - `gxx4.9.sh` - Install gcc/g++ version 4.9
+
+- `mount-share.sh` - Mount a share folder to VirtualMachine in VirtualBox
