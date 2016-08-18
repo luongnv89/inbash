@@ -1,0 +1,54 @@
+#!/bin/bash
+# Add this file to '/etc/network/if-up.d/' and '/etc/network/if-post-down.d/' folders and mark them as executables.
+
+NONE='\033[00m'
+RED='\033[01;31m'
+YELLOW='\033[01;33m'
+BLINK='\033[01;33m'
+issue="/etc/issue"
+
+columns=80
+#"$(tput cols)"
+#$(tput lines)" 
+#rows=$(( (row - 16) / 2))
+
+display_center(){
+    printf "%*s\n" $(( (${#1} + columns) / 2)) "$1" >> $issue
+}
+
+set_color(){
+    echo -e "$1\c" >> $issue
+}
+display_text(){
+    printf "%*s\n" 1 "$1" >> $issue
+}
+
+new_line(){
+   for ((i=0; i<=$1; i++)); do
+      display_text ""
+   done
+}
+
+print_ip(){
+  IP=$(/sbin/ifconfig | grep "inet addr" | grep -v "127.0.0.1" | awk '{ print $2 }' | awk -F: '{ print $2 }')
+  # IP=$(/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}')
+  display_center $IP
+}
+#clear screen
+echo -e '\e[H\e[2J' > $issue
+
+display_center "Welcome to Ubuntu Server 14.04"
+new_line 5
+set_color $YELLOW
+display_center "Stay FOOLISH, stay HUNGRY "
+display_center "             - Steve Jobs - "
+set_color $NONE
+new_line 3
+display_center "Access to the server via ssh command:"
+new_line 2
+set_color $BLINK
+print_ip
+set_color $NONE
+new_line 3
+display_text "Log in rescue to access the management utility"
+#set_color $NONE
