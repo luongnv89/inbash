@@ -1,3 +1,4 @@
 #!/bin/bash
-sudo apt-get install -y python python-pip
-sudo pip install scapy
+# Get started with scapy: http://www.secdev.org/projects/scapy/demo.html
+apt-get install -y python python-pip
+pip install scapy
