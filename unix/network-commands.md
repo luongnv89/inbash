@@ -12,6 +12,8 @@ Some network useful commands
 
 * Show statistic: `netstat -i`
 
-* Show all available network devices (event they are off): `cat /proc/net/dev` or `ip link show`
+* Show all available network devices (event they are off): `cat /proc/net/dev` or `ip link showo` or `ifconfig -a`
 
 * Check connection status of an interface: `sudo ethtool eth3 | grep "Link detected"`
+
+* Show hardware details information with: `dmidecode --type bios` -> More information: `man dmidecode` or refer to: https://www.howtoforge.com/dmidecode-finding-out-hardware-details-without-opening-the-computer-case
