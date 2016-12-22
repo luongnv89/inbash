@@ -12,6 +12,6 @@ Some network useful commands
 
 * Show statistic: `netstat -i`
 
-* Show all available network devices (event they are off): `cat /proc/net/dev`
+* Show all available network devices (event they are off): `cat /proc/net/dev` or `ip link show`
 
 * Check connection status of an interface: `sudo ethtool eth3 | grep "Link detected"`
