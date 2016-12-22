@@ -5,9 +5,9 @@
 echo '[info] Install valgrind for checking memory in c/c++ project'
 
 
-sudo apt-get update
-sudo apt-get install -y valgrind
-sudo apt-get autoremove
-sudo apt-get autoclean
+apt-get update
+apt-get install -y valgrind
+apt-get autoremove
+apt-get autoclean
 
 echo $(valgrind --version)

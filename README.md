@@ -1,6 +1,8 @@
 # inbash
 Bash scripts to do some work
 
+## For `UNIX` environment - `unix/`
+
 - `basic.sh` - Install basic packages: `vim`, `git`, `wget`
 
 - `show_ip_login.sh` - Show IP address in login screen (for `ssh` uses). Need to go with `show_ip`
@@ -18,3 +20,7 @@ Bash scripts to do some work
 - `gxx4.9.sh` - Install gcc/g++ version 4.9
 
 - `mount-share.sh` - Mount a share folder to VirtualMachine in VirtualBox
+
+## For `MAC` environment - `mac/`
+
+- `pygame.sh` - Install pygame 
