@@ -16,4 +16,8 @@ Some network useful commands
 
 * Check connection status of an interface: `sudo ethtool eth3 | grep "Link detected"`
 
+# System information
+
 * Show hardware details information with: `dmidecode --type bios` -> More information: `man dmidecode` or refer to: https://www.howtoforge.com/dmidecode-finding-out-hardware-details-without-opening-the-computer-case
+
+* Show hardware information: `lshw`
