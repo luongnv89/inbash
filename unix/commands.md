@@ -20,4 +20,7 @@ Some network useful commands
 
 * Show hardware details information with: `dmidecode --type bios` -> More information: `man dmidecode` or refer to: https://www.howtoforge.com/dmidecode-finding-out-hardware-details-without-opening-the-computer-case
 
-* Show hardware information: `lshw`
+* Show hardware information: `lshw`: `lshw -businfo|grep network`
+
+* Assign CPU core for a process: `taskset [options] mask command [argument...]`
+
