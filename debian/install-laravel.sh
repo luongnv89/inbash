@@ -21,6 +21,7 @@ sudo mv composer.phar /usr/local/bin/composer
 
 mkdir -p /var/www
 mkdir -p /var/www/html
+cd /var/www/html
 composer create-project laravel/laravel hello_world --prefer-dist
 
 echo 'Configuring Apache'
@@ -30,7 +31,7 @@ cp .env.example .env
 php artisan key:generate
 php artisan config:clear
 chmod 777 -R storage
-chmod chmod -R 777 bootstrap/cache
+chmod -R 777 bootstrap/cache
 sudo cp /home/montimage/inbash/unix/laravel.conf /etc/apache2/sites-available
 
 echo 'Activating Configure Apache'
