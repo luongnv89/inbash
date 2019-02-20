@@ -9,7 +9,7 @@ issue="/etc/issue"
 
 columns=80
 #"$(tput cols)"
-#$(tput lines)" 
+#$(tput lines)"
 #rows=$(( (row - 16) / 2))
 
 display_center(){
@@ -37,11 +37,11 @@ print_ip(){
 #clear screen
 echo -e '\e[H\e[2J' > $issue
 
-display_center "Welcome to Ubuntu Server 14.04"
+display_center "Welcome to Ubuntu Server"
 new_line 5
 set_color $YELLOW
-display_center "Stay FOOLISH, stay HUNGRY "
-display_center "             - Steve Jobs - "
+display_center "Do what you love and love what you are doing"
+display_center "             - You only live once - "
 set_color $NONE
 new_line 3
 display_center "Access to the server via ssh command:"

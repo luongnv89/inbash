@@ -9,4 +9,4 @@
 # Solution:
 # $ sudo apt-get install virtualbox-guest-dkms
 
-mount -t vboxsf -o uid=$(id -u),gid=$(id -g) projects /home/montimage/workspace/projects
+mount -t vboxsf -o uid=$(id -u),gid=$(id -g) workspace /home/montimage/workspace
