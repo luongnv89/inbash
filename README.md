@@ -30,6 +30,10 @@ Curated Bash scripts for quickly bootstrapping development environments on Linux
 | Script | Summary |
 | --- | --- |
 | [`app-removal-analyzer.sh`](./mac/app-removal-analyzer.sh) | Interactive, dry-run assistant for auditing and creating removal plans for macOS applications across package managers. |
+| [`docker.sh`](./mac/docker.sh) | Installs Docker Desktop via Homebrew with optional auto-launch. |
+| [`nodejs.sh`](./mac/nodejs.sh) | Installs Node.js (or specific versions) via Homebrew with optional force link. |
+| [`scapy.sh`](./mac/scapy.sh) | Installs Scapy, required dependencies, and can configure packet capture permissions. |
+| [`python-pip-uv.sh`](./mac/python-pip-uv.sh) | Installs Homebrew Python, updates pip, and installs the uv package manager. |
 
 ## Root-level scripts
 
