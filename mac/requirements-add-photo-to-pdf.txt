@@ -1,0 +1,7 @@
+# Requirements for add-photo-to-pdf.py
+# Install with: pip install -r requirements-add-photo-to-pdf.txt
+
+# PyMuPDF (fitz) - PDF manipulation library
+# Version 1.18.0+ recommended for full feature support (including opacity)
+# Older versions will work but with limited features
+pymupdf>=1.18.0
