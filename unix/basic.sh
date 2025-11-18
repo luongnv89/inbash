@@ -3,7 +3,7 @@
 ###############################################################################
 # inbash :: basic.sh
 # ---------------------------------------------------------------------------
-# Description : Installs a minimal set of CLI tools (git, vim, wget) on
+# Description : Installs a minimal set of CLI tools (git, vim, wget, curl) on
 #               Debian/Ubuntu systems.
 # Usage       : ./basic.sh [-y|--yes]
 # Example     : ./basic.sh --yes
@@ -13,7 +13,7 @@
 set -euo pipefail
 
 readonly SCRIPT_NAME="$(basename "$0")"
-readonly PACKAGES=(git vim wget)
+readonly PACKAGES=(git vim wget curl)
 
 AUTO_APPROVE=0
 
