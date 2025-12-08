@@ -102,6 +102,92 @@ def get_machine_specs():
     return specs
 
 
+def get_ollama_gpu_info():
+    """Get Ollama GPU usage information from 'ollama ps' and system info."""
+    gpu_info = {
+        "gpu_available": False,
+        "gpu_in_use": False,
+        "gpu_layers": "N/A",
+        "details": "Unknown"
+    }
+
+    try:
+        # Check if Ollama is running and get loaded models info
+        ps_result = subprocess.run(
+            ["ollama", "ps"],
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+
+        if ps_result.returncode == 0:
+            output = ps_result.stdout.strip()
+            lines = output.split('\n')
+            if len(lines) > 1:  # Has header + model info
+                # Parse the output to check GPU usage
+                # Format: NAME ID SIZE PROCESSOR UNTIL
+                for line in lines[1:]:
+                    if line.strip():
+                        parts = line.split()
+                        if len(parts) >= 4:
+                            processor = parts[3] if len(parts) > 3 else ""
+                            # Check if GPU is being used (e.g., "100% GPU" or "50% GPU/50% CPU")
+                            if "GPU" in processor.upper():
+                                gpu_info["gpu_in_use"] = True
+                                gpu_info["gpu_layers"] = processor
+                            elif "CPU" in processor.upper():
+                                gpu_info["gpu_layers"] = processor
+
+        # Check system for GPU availability
+        system = platform.system()
+        if system == "Darwin":
+            # Check for Apple Silicon (Metal support)
+            machine = platform.machine()
+            if machine == "arm64":
+                gpu_info["gpu_available"] = True
+                gpu_info["details"] = "Apple Silicon (Metal)"
+            else:
+                # Intel Mac - check for discrete GPU
+                gpu_result = subprocess.run(
+                    ["system_profiler", "SPDisplaysDataType"],
+                    capture_output=True, text=True
+                )
+                if "Metal" in gpu_result.stdout:
+                    gpu_info["gpu_available"] = True
+                    gpu_info["details"] = "Metal supported"
+
+        elif system == "Linux":
+            # Check for NVIDIA GPU
+            try:
+                nvidia_result = subprocess.run(
+                    ["nvidia-smi", "--query-gpu=name,memory.total", "--format=csv,noheader"],
+                    capture_output=True, text=True, timeout=5
+                )
+                if nvidia_result.returncode == 0 and nvidia_result.stdout.strip():
+                    gpu_info["gpu_available"] = True
+                    gpu_info["details"] = f"NVIDIA: {nvidia_result.stdout.strip()}"
+            except (FileNotFoundError, subprocess.TimeoutExpired):
+                pass
+
+            # Check for AMD ROCm
+            if not gpu_info["gpu_available"]:
+                try:
+                    rocm_result = subprocess.run(
+                        ["rocm-smi", "--showproductname"],
+                        capture_output=True, text=True, timeout=5
+                    )
+                    if rocm_result.returncode == 0:
+                        gpu_info["gpu_available"] = True
+                        gpu_info["details"] = "AMD ROCm"
+                except (FileNotFoundError, subprocess.TimeoutExpired):
+                    pass
+
+    except Exception as e:
+        gpu_info["error"] = str(e)
+
+    return gpu_info
+
+
 def get_ollama_models():
     """Get list of available models from ollama ls."""
     try:
@@ -192,8 +278,13 @@ def benchmark_model(model_name, prompt, timeout=300):
         }
 
 
-def generate_markdown_report(results, machine_specs, output_file="ollama_benchmark_report.md"):
+def generate_markdown_report(results, machine_specs, ollama_gpu_info, output_file="ollama_benchmark_report.md"):
     """Generate a markdown report with benchmark results."""
+
+    # Determine GPU status for Ollama
+    gpu_status = "Yes" if ollama_gpu_info.get('gpu_in_use') else "No"
+    if ollama_gpu_info.get('gpu_available') and not ollama_gpu_info.get('gpu_in_use'):
+        gpu_status = "Available but not used"
 
     content = f"""# Ollama Model Benchmark Report
 
@@ -210,6 +301,15 @@ def generate_markdown_report(results, machine_specs, output_file="ollama_benchma
 | **GPU** | {machine_specs.get('gpu', 'N/A')} |
 | **Architecture** | {machine_specs.get('machine', 'N/A')} |
 | **Python Version** | {machine_specs.get('python_version', 'N/A')} |
+
+## Ollama GPU Status
+
+| Property | Value |
+|----------|-------|
+| **GPU Available** | {"Yes" if ollama_gpu_info.get('gpu_available') else "No"} |
+| **GPU Backend** | {ollama_gpu_info.get('details', 'N/A')} |
+| **Ollama Using GPU** | {gpu_status} |
+| **GPU/CPU Split** | {ollama_gpu_info.get('gpu_layers', 'N/A')} |
 
 ## Summary
 
@@ -323,6 +423,15 @@ Examples:
     print(f"  Memory: {machine_specs.get('memory_gb', 'N/A')} GB")
     print(f"  GPU: {machine_specs.get('gpu', 'N/A')}")
 
+    # Check Ollama GPU status
+    print("\nChecking Ollama GPU status...")
+    ollama_gpu_info = get_ollama_gpu_info()
+    gpu_status = "Yes" if ollama_gpu_info.get('gpu_in_use') else "No"
+    if ollama_gpu_info.get('gpu_available') and not ollama_gpu_info.get('gpu_in_use'):
+        gpu_status = "Available (checking after first model load)"
+    print(f"  GPU Available: {'Yes' if ollama_gpu_info.get('gpu_available') else 'No'}")
+    print(f"  GPU Backend: {ollama_gpu_info.get('details', 'N/A')}")
+
     # Determine which models to benchmark
     specified_models = []
     if args.models:
@@ -362,9 +471,17 @@ Examples:
         else:
             print(f"✗ ({result.get('error', 'Unknown error')})")
 
+        # After first successful benchmark, re-check GPU status (model is now loaded)
+        if i == 1 and result['status'] == 'success':
+            ollama_gpu_info = get_ollama_gpu_info()
+            if ollama_gpu_info.get('gpu_in_use'):
+                print(f"  -> GPU acceleration: Active ({ollama_gpu_info.get('gpu_layers', 'N/A')})")
+            elif ollama_gpu_info.get('gpu_available'):
+                print(f"  -> GPU acceleration: Not used (CPU only)")
+
     # Generate markdown report
     print("\nGenerating report...")
-    report_file = generate_markdown_report(results, machine_specs, output_file=args.output)
+    report_file = generate_markdown_report(results, machine_specs, ollama_gpu_info, output_file=args.output)
     
     # Print summary
     print("\n" + "=" * 50)
