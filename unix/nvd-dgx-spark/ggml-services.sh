@@ -3,10 +3,18 @@
 # =========================================
 # GGML AI Services Manager for DGX Spark
 # =========================================
+# 
+# If you get "model is private" errors, you may need to:
+# 1. Login to HuggingFace: huggingface-cli login
+# 2. Or set: export HF_TOKEN=your_token_here
+#
+# To customize models, edit the SERVICES array below.
+# =========================================
 
 # Configuration
 LLAMA_SERVER=~/ggml-org/llama.cpp/build-cuda/bin/llama-server
 WHISPER_SERVER=~/ggml-org/whisper.cpp/build-cuda/bin/whisper-server
+WHISPER_MODEL="$HOME/ggml-org/whisper.cpp/models/ggml-base.en.bin"
 LOG_DIR=~/ggml-logs
 mkdir -p "$LOG_DIR"
 
@@ -19,13 +27,14 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Service definitions: name|port|command
+# Using verified PUBLIC models from HuggingFace
 declare -A SERVICES
 SERVICES=(
-    ["1_embeddings"]="8021|Embeddings (Gemma)|$LLAMA_SERVER -hf google/gemma-3-1b-it-qat-q4_0-gguf --port 8021 --host 0.0.0.0 --embedding -ngl 99 --no-mmap"
-    ["2_fim"]="8022|Code Completion FIM (Qwen)|$LLAMA_SERVER -hf Qwen/Qwen2.5-Coder-7B-Instruct-GGUF --port 8022 --host 0.0.0.0 --ctx-size 32768 -ngl 99 --no-mmap"
+    ["1_embeddings"]="8021|Embeddings (Nomic)|$LLAMA_SERVER -hf nomic-ai/nomic-embed-text-v1.5-GGUF --port 8021 --host 0.0.0.0 --embedding -ngl 99 --no-mmap"
+    ["2_fim"]="8022|Code Completion FIM (Qwen2.5-Coder)|$LLAMA_SERVER -hf Qwen/Qwen2.5-Coder-7B-Instruct-GGUF --port 8022 --host 0.0.0.0 --ctx-size 32768 -ngl 99 --no-mmap"
     ["3_chat"]="8023|Chat/Tools (GPT-OSS 120B)|$LLAMA_SERVER -hf ggml-org/gpt-oss-120b-GGUF --port 8023 --host 0.0.0.0 --ctx-size 131072 -np 8 --jinja -ub 2048 -b 2048 -ngl 99 --no-mmap"
-    ["4_vision"]="8024|Vision (Gemma)|$LLAMA_SERVER -hf google/gemma-3-4b-it-qat-q4_0-gguf --port 8024 --host 0.0.0.0 --ctx-size 8192 -ngl 99 --no-mmap"
-    ["5_stt"]="8025|Speech-to-Text (Whisper)|$WHISPER_SERVER --port 8025 --host 0.0.0.0"
+    ["4_vision"]="8024|Vision (Qwen2-VL 7B)|$LLAMA_SERVER -hf Qwen/Qwen2-VL-7B-Instruct-GGUF --port 8024 --host 0.0.0.0 --ctx-size 8192 -ngl 99 --no-mmap"
+    ["5_stt"]="8025|Speech-to-Text (Whisper)|$WHISPER_SERVER -m $WHISPER_MODEL --port 8025 --host 0.0.0.0"
 )
 
 # Check if a port is in use
@@ -73,6 +82,14 @@ start_service() {
     
     if is_port_running "$port"; then
         echo -e "  ${YELLOW}⚠ $name is already running on port $port${NC}"
+        return 1
+    fi
+    
+    # Special check for whisper model
+    if [[ "$key" == "5_stt" ]] && [[ ! -f "$WHISPER_MODEL" ]]; then
+        echo -e "  ${RED}✗ Whisper model not found: $WHISPER_MODEL${NC}"
+        echo -e "  ${YELLOW}  Download it with:${NC}"
+        echo -e "  ${YELLOW}  cd ~/ggml-org/whisper.cpp && bash ./models/download-ggml-model.sh base.en${NC}"
         return 1
     fi
     
@@ -348,7 +365,32 @@ case "${1:-}" in
         echo "  --start-all  Start all services"
         echo "  --stop-all   Stop all services"
         echo "  --status     Show service status"
+        echo "  --models     Show configured models"
         echo "  --help       Show this help"
+        echo ""
+        echo "Models used (edit script to customize):"
+        echo "  Embeddings: nomic-ai/nomic-embed-text-v1.5-GGUF"
+        echo "  Code/FIM:   Qwen/Qwen2.5-Coder-7B-Instruct-GGUF"
+        echo "  Chat:       ggml-org/gpt-oss-120b-GGUF"
+        echo "  Vision:     Qwen/Qwen2-VL-7B-Instruct-GGUF"
+        echo "  STT:        whisper base.en"
+        echo ""
+        echo "If you get 'model is private' errors:"
+        echo "  export HF_TOKEN=your_huggingface_token"
+        echo "  # or run: huggingface-cli login"
+        echo ""
+        ;;
+    --models)
+        echo ""
+        echo "Configured Models:"
+        echo "─────────────────────────────────────────────────────────────"
+        echo "  [8021] Embeddings:  nomic-ai/nomic-embed-text-v1.5-GGUF"
+        echo "  [8022] Code/FIM:    Qwen/Qwen2.5-Coder-7B-Instruct-GGUF"
+        echo "  [8023] Chat:        ggml-org/gpt-oss-120b-GGUF"
+        echo "  [8024] Vision:      Qwen/Qwen2-VL-7B-Instruct-GGUF"
+        echo "  [8025] STT:         whisper base.en ($WHISPER_MODEL)"
+        echo ""
+        echo "Edit this script to change models."
         echo ""
         ;;
     *)

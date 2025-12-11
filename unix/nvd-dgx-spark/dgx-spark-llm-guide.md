@@ -30,11 +30,16 @@ The NVIDIA DGX Spark features:
 
 | Service | Port | Model | Purpose |
 |---------|------|-------|---------|
-| Embeddings | 8021 | Gemma | Text embeddings for RAG |
-| Code Completion | 8022 | Qwen | Fill-in-the-middle (FIM) |
-| Chat/Tools | 8023 | GPT-OSS | General LLM, chat, agents |
-| Vision | 8024 | Gemma Vision | Image analysis |
+| Embeddings | 8021 | Nomic Embed v1.5 | Text embeddings for RAG |
+| Code Completion | 8022 | Qwen2.5 Coder 7B | Fill-in-the-middle (FIM) |
+| Chat/Tools | 8023 | GPT-OSS 120B | General LLM, chat, agents |
+| Vision | 8024 | Qwen2-VL 7B | Image analysis |
 | Speech-to-Text | 8025 | Whisper | Audio transcription |
+
+**Note:** All models above are PUBLIC on HuggingFace. If you get "model is private" errors, run:
+```bash
+export HF_TOKEN=your_huggingface_token
+```
 
 ---
 
@@ -145,6 +150,7 @@ For a basic script that starts all services:
 
 LLAMA_SERVER=~/ggml-org/llama.cpp/build-cuda/bin/llama-server
 WHISPER_SERVER=~/ggml-org/whisper.cpp/build-cuda/bin/whisper-server
+WHISPER_MODEL="$HOME/ggml-org/whisper.cpp/models/ggml-base.en.bin"
 
 # Kill any existing services
 pkill -f "llama-server" 2>/dev/null
@@ -153,33 +159,33 @@ sleep 2
 
 echo "Starting ggml AI services..."
 
-# Port 8021: Embeddings (Gemma)
+# Port 8021: Embeddings (Nomic - PUBLIC)
 $LLAMA_SERVER \
-  -hf google/gemma-3-1b-it-qat-q4_0-gguf \
+  -hf nomic-ai/nomic-embed-text-v1.5-GGUF \
   --port 8021 --host 0.0.0.0 \
   --embedding -ngl 99 --no-mmap &
 
-# Port 8022: Code Completion / FIM (Qwen)
+# Port 8022: Code Completion / FIM (Qwen2.5 Coder - PUBLIC)
 $LLAMA_SERVER \
   -hf Qwen/Qwen2.5-Coder-7B-Instruct-GGUF \
   --port 8022 --host 0.0.0.0 \
   --ctx-size 32768 -ngl 99 --no-mmap &
 
-# Port 8023: Chat / Tools (GPT-OSS 120B)
+# Port 8023: Chat / Tools (GPT-OSS 120B - PUBLIC)
 $LLAMA_SERVER \
   -hf ggml-org/gpt-oss-120b-GGUF \
   --port 8023 --host 0.0.0.0 \
   --ctx-size 131072 -np 8 --jinja \
   -ub 2048 -b 2048 -ngl 99 --no-mmap &
 
-# Port 8024: Vision (Gemma Vision)
+# Port 8024: Vision (Qwen2-VL - PUBLIC)
 $LLAMA_SERVER \
-  -hf google/gemma-3-4b-it-qat-q4_0-gguf \
+  -hf Qwen/Qwen2-VL-7B-Instruct-GGUF \
   --port 8024 --host 0.0.0.0 \
   --ctx-size 8192 -ngl 99 --no-mmap &
 
 # Port 8025: Speech-to-Text (Whisper)
-$WHISPER_SERVER \
+$WHISPER_SERVER -m $WHISPER_MODEL \
   --port 8025 --host 0.0.0.0 &
 
 echo "All services starting... Check with: netstat -ntpl | grep 802"
@@ -273,6 +279,12 @@ git clone https://github.com/ggml-org/whisper.cpp ~/whisper.cpp
 cd ~/whisper.cpp
 cmake -B build-cuda -DGGML_CUDA=ON
 cmake --build build-cuda -j
+
+# Download the Whisper model (required!)
+bash ./models/download-ggml-model.sh base.en
+
+# Verify model exists
+ls -la models/ggml-base.en.bin
 ```
 
 ---
