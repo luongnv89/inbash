@@ -105,6 +105,127 @@ netstat -ntpl | grep "802"
 nvidia-smi
 ```
 
+### Starting Services After Installation (Without Reinstalling)
+
+If you've already run the setup script once and just want to manage services, use the interactive service manager:
+
+**Option A: Interactive Service Manager (Recommended)**
+
+Download and run the interactive manager:
+```bash
+# Download the script
+curl -o ~/ggml-services.sh https://your-server/ggml-services.sh
+# Or copy from this guide's attachments
+
+chmod +x ~/ggml-services.sh
+~/ggml-services.sh
+```
+
+Features:
+- Interactive menu to select which services to start/stop
+- Checks if services are already running (won't duplicate)
+- Color-coded status display
+- Logs stored in `~/ggml-logs/`
+
+Command line options:
+```bash
+~/ggml-services.sh              # Interactive mode
+~/ggml-services.sh --start-all  # Start all services
+~/ggml-services.sh --stop-all   # Stop all services  
+~/ggml-services.sh --status     # Show status only
+```
+
+**Option B: Simple Startup Script**
+
+For a basic script that starts all services:
+
+```bash
+#!/bin/bash
+# Save as ~/start-ggml-services.sh
+
+LLAMA_SERVER=~/ggml-org/llama.cpp/build-cuda/bin/llama-server
+WHISPER_SERVER=~/ggml-org/whisper.cpp/build-cuda/bin/whisper-server
+
+# Kill any existing services
+pkill -f "llama-server" 2>/dev/null
+pkill -f "whisper-server" 2>/dev/null
+sleep 2
+
+echo "Starting ggml AI services..."
+
+# Port 8021: Embeddings (Gemma)
+$LLAMA_SERVER \
+  -hf google/gemma-3-1b-it-qat-q4_0-gguf \
+  --port 8021 --host 0.0.0.0 \
+  --embedding -ngl 99 --no-mmap &
+
+# Port 8022: Code Completion / FIM (Qwen)
+$LLAMA_SERVER \
+  -hf Qwen/Qwen2.5-Coder-7B-Instruct-GGUF \
+  --port 8022 --host 0.0.0.0 \
+  --ctx-size 32768 -ngl 99 --no-mmap &
+
+# Port 8023: Chat / Tools (GPT-OSS 120B)
+$LLAMA_SERVER \
+  -hf ggml-org/gpt-oss-120b-GGUF \
+  --port 8023 --host 0.0.0.0 \
+  --ctx-size 131072 -np 8 --jinja \
+  -ub 2048 -b 2048 -ngl 99 --no-mmap &
+
+# Port 8024: Vision (Gemma Vision)
+$LLAMA_SERVER \
+  -hf google/gemma-3-4b-it-qat-q4_0-gguf \
+  --port 8024 --host 0.0.0.0 \
+  --ctx-size 8192 -ngl 99 --no-mmap &
+
+# Port 8025: Speech-to-Text (Whisper)
+$WHISPER_SERVER \
+  --port 8025 --host 0.0.0.0 &
+
+echo "All services starting... Check with: netstat -ntpl | grep 802"
+```
+
+Make it executable and run:
+```bash
+chmod +x ~/start-ggml-services.sh
+~/start-ggml-services.sh
+```
+
+### Stop All Services
+
+```bash
+pkill -f "llama-server"
+pkill -f "whisper-server"
+```
+
+### Create a Systemd Service (Auto-Start on Boot)
+
+```bash
+# Create service file
+sudo tee /etc/systemd/system/ggml-services.service << 'EOF'
+[Unit]
+Description=GGML AI Services
+After=network.target
+
+[Service]
+Type=forking
+User=YOUR_USERNAME
+ExecStart=/home/YOUR_USERNAME/start-ggml-services.sh
+ExecStop=/usr/bin/pkill -f llama-server ; /usr/bin/pkill -f whisper-server
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Replace YOUR_USERNAME and enable
+sudo sed -i "s/YOUR_USERNAME/$USER/g" /etc/systemd/system/ggml-services.service
+sudo systemctl daemon-reload
+sudo systemctl enable ggml-services
+sudo systemctl start ggml-services
+```
+
 ---
 
 ## Manual Installation
@@ -460,7 +581,20 @@ docker run -d \
 
 ### Start All Services (ggml way)
 ```bash
+# First time / full reinstall
 bash <(curl -s https://ggml.ai/dgx-spark.sh)
+
+# Interactive service manager (select which to start)
+~/ggml-services.sh
+
+# Start all services (non-interactive)
+~/ggml-services.sh --start-all
+
+# Check status
+~/ggml-services.sh --status
+
+# Stop all services
+~/ggml-services.sh --stop-all
 ```
 
 ### Service Endpoints
