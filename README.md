@@ -1,7 +1,11 @@
 # inbash
 
 <p align="center">
-  <img src="./assets/inbash-logo.svg" alt="inbash logo" width="220" />
+  <img src="./assets/logo/logo-full.svg" alt="inbash logo" width="320" />
+</p>
+
+<p align="center">
+  <em>Bootstrap your dev environment in a single command.</em>
 </p>
 
 Curated Bash scripts for quickly bootstrapping development environments on Linux and macOS. Each script now includes usage examples, safety prompts, logging, and updated installation steps.

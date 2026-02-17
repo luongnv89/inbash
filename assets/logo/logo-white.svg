@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="inbash logo white version" viewBox="0 0 320 80">
+  <!-- White hexagon mark for dark backgrounds -->
+  <polygon points="40,4 73,23 73,61 40,80 7,61 7,23" fill="#FFFFFF"/>
+  <!-- Terminal chevron (green on white) -->
+  <polyline points="18,32 30,40 18,48" fill="none" stroke="#22C55E" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Cursor (dark on white) -->
+  <line x1="34" y1="48" x2="46" y2="48" stroke="#000000" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+
+  <!-- Wordmark all white -->
+  <text x="90" y="53" font-family="'Fira Mono', 'Menlo', 'Courier New', monospace" font-size="40" font-weight="700" fill="#FFFFFF" opacity="0.6" letter-spacing="-1">in</text>
+  <text x="137" y="53" font-family="'Fira Mono', 'Menlo', 'Courier New', monospace" font-size="40" font-weight="700" fill="#FFFFFF" letter-spacing="-1">bash</text>
+  <!-- Green accent underline -->
+  <line x1="137" y1="60" x2="315" y2="60" stroke="#22C55E" stroke-width="3" stroke-linecap="round"/>
+</svg>

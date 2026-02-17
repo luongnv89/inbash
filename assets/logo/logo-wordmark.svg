@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="inbash wordmark" viewBox="0 0 200 48">
+  <!-- "in" prefix in gray -->
+  <text x="0" y="36" font-family="'Fira Mono', 'Menlo', 'Courier New', monospace" font-size="38" font-weight="700" fill="#6B7280" letter-spacing="-1">in</text>
+  <!-- "bash" in black -->
+  <text x="48" y="36" font-family="'Fira Mono', 'Menlo', 'Courier New', monospace" font-size="38" font-weight="700" fill="#000000" letter-spacing="-1">bash</text>
+  <!-- Green accent underline beneath "bash" -->
+  <line x1="48" y1="42" x2="196" y2="42" stroke="#22C55E" stroke-width="3" stroke-linecap="round"/>
+</svg>

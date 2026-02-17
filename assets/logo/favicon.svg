@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="inbash favicon" viewBox="0 0 16 16">
+  <!-- Black hexagon -->
+  <polygon points="8,1 14.5,4.5 14.5,11.5 8,15 1.5,11.5 1.5,4.5" fill="#000000"/>
+  <!-- Chevron > simplified for tiny size -->
+  <polyline points="4,6 7,8 4,10" fill="none" stroke="#22C55E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Cursor dot -->
+  <rect x="8" y="9" width="3.5" height="1.5" rx="0.75" fill="#FFFFFF" opacity="0.85"/>
+</svg>

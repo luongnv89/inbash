@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="inbash app icon" viewBox="0 0 512 512">
+  <!-- Square background -->
+  <rect width="512" height="512" rx="112" fill="#000000"/>
+  <!-- Hexagon -->
+  <polygon points="256,52 430,152 430,352 256,452 82,352 82,152" fill="#111111" stroke="#22C55E" stroke-width="10"/>
+  <!-- Terminal panel -->
+  <rect x="140" y="180" width="232" height="160" rx="18" fill="#FFFFFF" opacity="0.05"/>
+  <!-- Chevron prompt > -->
+  <polyline points="160,232 212,258 160,284" fill="none" stroke="#22C55E" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Cursor underscore -->
+  <line x1="224" y1="284" x2="310" y2="284" stroke="#FFFFFF" stroke-width="20" stroke-linecap="round" opacity="0.80"/>
+</svg>

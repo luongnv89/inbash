@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="inbash logo mark" viewBox="0 0 100 100">
+  <!-- Hexagon mark only -->
+  <polygon points="50,4 93,27.5 93,72.5 50,96 7,72.5 7,27.5" fill="#000000" stroke="none"/>
+  <!-- Terminal window inner -->
+  <rect x="22" y="30" width="56" height="42" rx="5" fill="#FFFFFF" opacity="0.06"/>
+  <!-- Chevron prompt > -->
+  <polyline points="28,45 40,52 28,59" fill="none" stroke="#22C55E" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Cursor underscore -->
+  <line x1="44" y1="59" x2="58" y2="59" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" opacity="0.85"/>
+</svg>
