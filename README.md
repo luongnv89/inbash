@@ -22,6 +22,7 @@ Curated Bash scripts for quickly bootstrapping development environments on Linux
 | [`nodejs.sh`](./unix/nodejs.sh) | Installs the latest Node.js LTS release via NodeSource with optional repo cleanup. |
 | [`python3-pip.sh`](./unix/python3-pip.sh) | Installs `python3-pip` and updates `python`/`pip` alternatives to point at Python 3. |
 | [`scapy.sh`](./unix/scapy.sh) | Prepares system dependencies and installs Scapy (Python 3) plus optional HTTP helpers. |
+| [`setup-ssh.sh`](./unix/setup-ssh.sh) | Installs and configures `openssh-server` for remote SSH access with status checks, firewall setup, validation, and connection instructions. |
 | [`show_ip`](./unix/show_ip) | Generates the SSH login banner showing active IPv4 addresses; supports dry-run and custom targets. |
 | [`show_ip_login.sh`](./unix/show_ip_login.sh) | Installs the `show_ip` hook into `/etc/network/if-{up,post-down}.d` with backups and prompts. |
 | [`update_network_interfaces.sh`](./unix/update_network_interfaces.sh) | Deploys a templated `/etc/network/interfaces` file with backups and selectively brings interfaces online. |
