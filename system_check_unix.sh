@@ -4,7 +4,7 @@
 # inbash :: system_check_unix.sh
 # ---------------------------------------------------------------------------
 # Description : Quick system spec + status report for macOS & Linux (OS, CPU,
-#               GPU, memory, disks).
+#               GPU, memory, disks, network/IP addresses).
 # Usage       : ./system_check_unix.sh
 # Example     : ./system_check_unix.sh
 # Requirements: macOS or Linux with common system utilities (uname, awk, df).
@@ -156,6 +156,59 @@ get_mem_info() {
   fi
 }
 
+get_network_info() {
+  print_header "NETWORK / IP ADDRESSES"
+  local os_type
+  os_type=$(uname -s)
+
+  # Public IP
+  local public_ip=""
+  if command -v curl >/dev/null 2>&1; then
+    public_ip=$(curl -s --max-time 5 https://ifconfig.me 2>/dev/null || true)
+  elif command -v wget >/dev/null 2>&1; then
+    public_ip=$(wget -qO- --timeout=5 https://ifconfig.me 2>/dev/null || true)
+  fi
+  echo "Public IP: ${public_ip:-N/A (no internet or curl/wget unavailable)}"
+
+  # Private / interface IPs
+  echo "Interface IPs:"
+  if [[ "$os_type" == "Darwin" ]]; then
+    # macOS – iterate over active network interfaces
+    for iface in $(ifconfig -lu 2>/dev/null); do
+      local addrs
+      addrs=$(ifconfig "$iface" 2>/dev/null | awk '/inet / {print $2}')
+      if [[ -n "$addrs" && "$addrs" != "127.0.0.1" ]]; then
+        echo "  $iface: $addrs"
+      fi
+      # Also show IPv6 (non-link-local), joined on one line
+      local addrs6
+      addrs6=$(ifconfig "$iface" 2>/dev/null | awk '/inet6 / && !/fe80/ {printf sep $2; sep=", "}')
+      if [[ -n "$addrs6" ]]; then
+        echo "  $iface (v6): $addrs6"
+      fi
+    done
+  elif [[ "$os_type" == "Linux" ]]; then
+    if command -v ip >/dev/null 2>&1; then
+      ip -o addr show 2>/dev/null | awk '
+        $3 == "inet" && $4 !~ /^127\./ {
+          split($4, a, "/"); printf "  %s: %s\n", $2, a[1]
+        }
+        $3 == "inet6" && $4 !~ /^fe80/ && $4 !~ /^::1/ {
+          split($4, a, "/"); printf "  %s (v6): %s\n", $2, a[1]
+        }'
+    elif command -v ifconfig >/dev/null 2>&1; then
+      ifconfig 2>/dev/null | awk '
+        /^[^ ]/ {iface=$1}
+        /inet / && $2 !~ /^127\./ {print "  " iface " " $2}
+        /inet6/ && $0 !~ /fe80/ && $0 !~ /::1/ {print "  " iface " (v6) " $2}'
+    else
+      echo "  (ip and ifconfig not available)"
+    fi
+  else
+    echo "  Unknown OS type for network info"
+  fi
+}
+
 get_disk_info() {
   print_header "DISK INFO"
   local os_type
@@ -186,6 +239,7 @@ main() {
   get_gpu_info
   get_mem_info
   get_disk_info
+  get_network_info
 
   echo
   echo "Done."
