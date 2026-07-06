@@ -5,6 +5,7 @@
 # ---------------------------------------------------------------------------
 # Description : Installs recommended Oh My Zsh community plugins and copies a
 #               curated .zshrc configuration for the current user.
+#               Works on any Linux/macOS machine with Oh My Zsh installed.
 # Usage       : ./setup-ohMyZsh.sh [-y|--yes] [--config <path>]
 # Example     : ./setup-ohMyZsh.sh --yes --config ./zshrc-config
 # Requirements: git, curl (for Oh My Zsh), existing Oh My Zsh installation.
@@ -117,11 +118,15 @@ for plugin_repo in "${DEFAULT_PLUGINS[@]}"; do
   clone_plugin "$plugin_repo"
 done
 
+# --- Backup existing .zshrc ---
+
 backup_path="$HOME/.zshrc.$(date +%Y%m%d%H%M%S).bak"
 if [[ -f "$HOME/.zshrc" ]]; then
   log_info "Backing up existing ~/.zshrc to '$backup_path'."
   cp "$HOME/.zshrc" "$backup_path"
 fi
+
+# --- Copy config ---
 
 log_info "Copying config from '$CONFIG_SOURCE' to '$HOME/.zshrc'."
 cp "$CONFIG_SOURCE" "$HOME/.zshrc"
