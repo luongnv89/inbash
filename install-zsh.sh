@@ -78,27 +78,36 @@ detect_os() {
 
 install_zsh_linux() {
   local os_id="$1"
+  local sudo_cmd=()
   log_info "Detected Linux distribution: $os_id"
+
+  if [[ $EUID -ne 0 ]]; then
+    if ! command -v sudo >/dev/null 2>&1; then
+      log_error "Package installation requires root privileges or sudo. Re-run as root or install sudo."
+      exit 1
+    fi
+    sudo_cmd=(sudo)
+  fi
 
   if command -v apt-get >/dev/null 2>&1; then
     log_info "Installing Zsh via apt..."
-    DEBIAN_FRONTEND=noninteractive sudo apt-get update -y
-    DEBIAN_FRONTEND=noninteractive sudo apt-get install -y zsh
+    DEBIAN_FRONTEND=noninteractive "${sudo_cmd[@]}" apt-get update -y
+    DEBIAN_FRONTEND=noninteractive "${sudo_cmd[@]}" apt-get install -y zsh
   elif command -v dnf >/dev/null 2>&1; then
     log_info "Installing Zsh via dnf..."
-    sudo dnf install -y zsh
+    "${sudo_cmd[@]}" dnf install -y zsh
   elif command -v yum >/dev/null 2>&1; then
     log_info "Installing Zsh via yum..."
-    sudo yum install -y zsh
+    "${sudo_cmd[@]}" yum install -y zsh
   elif command -v pacman >/dev/null 2>&1; then
     log_info "Installing Zsh via pacman..."
-    sudo pacman -Sy --noconfirm zsh
+    "${sudo_cmd[@]}" pacman -Sy --noconfirm zsh
   elif command -v apk >/dev/null 2>&1; then
     log_info "Installing Zsh via apk..."
-    sudo apk add zsh
+    "${sudo_cmd[@]}" apk add zsh
   elif command -v zypper >/dev/null 2>&1; then
     log_info "Installing Zsh via zypper..."
-    sudo zypper install -y zsh
+    "${sudo_cmd[@]}" zypper install -y zsh
   else
     log_error "No supported package manager found. Install zsh manually."
     exit 1
