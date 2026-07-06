@@ -49,7 +49,9 @@ fi
 # Homebrew (macOS / Linuxbrew)
 # =================================================================
 if command -v brew >/dev/null 2>&1; then
-  eval "$(/opt/homebrew/bin/brew shellenv 2>/dev/null || /home/linuxbrew/.linuxbrew/bin/brew shellenv 2>/dev/null)"
+  _BREW_BIN="$(command -v brew)"
+  eval "$("$_BREW_BIN" shellenv 2>/dev/null)"
+  unset _BREW_BIN
 fi
 
 # =================================================================
@@ -94,12 +96,15 @@ fi
 # AI Coding Assistants (optional — only adds to PATH if present)
 # =================================================================
 
+_COMPLETION_CACHE_DIR="$HOME/.local/share"
+
 # Claude Code (Anthropic)
 # Installed via: npm i -g @anthropic-ai/claude-code  OR  pipx install claude-code
 if command -v claude >/dev/null 2>&1; then
   # Generate and source shell completion (one-time, cached)
-  _CLAUDE_COMP="$HOME/.local/share/claude-shell-completion.zsh"
+  _CLAUDE_COMP="$_COMPLETION_CACHE_DIR/claude-shell-completion.zsh"
   if [ ! -f "$_CLAUDE_COMP" ]; then
+    mkdir -p "$_COMPLETION_CACHE_DIR"
     claude completion zsh > "$_CLAUDE_COMP" 2>/dev/null || true
   fi
   [ -s "$_CLAUDE_COMP" ] && source "$_CLAUDE_COMP"
@@ -110,8 +115,9 @@ fi
 if command -v codex >/dev/null 2>&1; then
   export PATH="$HOME/.codex/bin:$PATH"
   # Generate and source shell completion (one-time, cached)
-  _CODEX_COMP="$HOME/.local/share/codex-shell-completion.zsh"
+  _CODEX_COMP="$_COMPLETION_CACHE_DIR/codex-shell-completion.zsh"
   if [ ! -f "$_CODEX_COMP" ]; then
+    mkdir -p "$_COMPLETION_CACHE_DIR"
     codex completion zsh > "$_CODEX_COMP" 2>/dev/null || true
   fi
   [ -s "$_CODEX_COMP" ] && source "$_CODEX_COMP"
@@ -121,12 +127,15 @@ fi
 # Installed via: npm i -g @earendil-works/pi-coding-agent
 if command -v pi >/dev/null 2>&1; then
   # Generate and source shell completion (one-time, cached)
-  _PI_COMP="$HOME/.local/share/pi-shell-completion.zsh"
+  _PI_COMP="$_COMPLETION_CACHE_DIR/pi-shell-completion.zsh"
   if [ ! -f "$_PI_COMP" ]; then
+    mkdir -p "$_COMPLETION_CACHE_DIR"
     pi completion zsh > "$_PI_COMP" 2>/dev/null || true
   fi
   [ -s "$_PI_COMP" ] && source "$_PI_COMP"
 fi
+
+unset _COMPLETION_CACHE_DIR _CLAUDE_COMP _CODEX_COMP _PI_COMP
 
 # =================================================================
 # NVM (Node Version Manager) — optional
